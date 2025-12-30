@@ -1,0 +1,6 @@
+/target
+/web/node_modules
+/web/dist
+/pgdata
+*.log
+.DS_Store

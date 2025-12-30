@@ -1,0 +1,32 @@
+services:
+  vanmoi:
+    build: .
+    container_name: vanmoi
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    environment:
+      - DATABASE_URL=postgres://vanmoi:vanmoi@db:5432/vanmoi
+      - LISTEN_ADDR=0.0.0.0:8080
+      - RUST_LOG=vanmoi=info,tower_http=info
+      - ADMIN_USERNAME=admin
+      - ADMIN_PASSWORD=changeme
+    depends_on:
+      db:
+        condition: service_healthy
+
+  db:
+    image: ghcr.io/vansour/postgres:trixie
+    container_name: vanmoi-db
+    restart: unless-stopped
+    environment:
+      - POSTGRES_USER=vanmoi
+      - POSTGRES_PASSWORD=vanmoi
+      - POSTGRES_DB=vanmoi
+    volumes:
+      - ./pgdata:/var/lib/postgresql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U vanmoi"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
